@@ -13,6 +13,32 @@ Though the focus of this project is on genetic algorithms, it is nonetheless val
 - Artificial Potential Fields
 - Rapidly Exploring Random Trees
 
+## Installation
+
+It is recommended that you create a new virtual environment:
+
+```
+conda create -n path-planning python=3.6
+```
+
+The environment must first be activated:
+
+```
+conda activate path-planning
+```
+
+The following dependencies need to be installed:
+
+```
+conda install numpy matplotlib scipy shapely
+```
+
+The code can then be executed, for example via command line:
+
+```
+python genetic-algorithm.py
+```
+
 ## Visualization
 
 The results from running the genetic algorithm code (with the default arguments) are shown below:
