@@ -72,14 +72,33 @@ class Polygon(SPolygon):
         return self.rotation * 180.0 / np.pi
 
 
+class Grid:
+    def __init__(self, minimum, maximum, offset):
+        self.minimum = minimum
+        self.maximum = maximum
+        self.width = maximum.x - minimum.x
+        self.height = maximum.y - minimum.y
+        self.first = self.minimum.translate(Point(offset, offset))
+        self.final = self.maximum.translate(Point(-offset, -offset))
+
+    def random(self, limit):
+        return Point(
+            np.random.randint(self.minimum.x+limit, self.maximum.x-limit),
+            np.random.randint(self.minimum.y+limit, self.maximum.y-limit),
+        )
+
+
 def main():
-    # ------- temporary: to be updated shortly -------
+    vehicleOffset = 2.0
 
-    example_line = Line(Point(1, 1), Point(11, 11))
-    print(example_line.dx, example_line.dy)
+    environmentMin = 0.0
+    environmentMax = 20.0
 
-    example_poly = Polygon(5, 5, 0, Point(5, 5))
-    print(example_poly.width, example_poly.height)
+    vehicleGrid = Grid(Point(environmentMin, environmentMin), Point(environmentMax, environmentMax), vehicleOffset)
+
+    shortestPath = Line(vehicleGrid.first, vehicleGrid.final)
+
+    populationCount = 50
 
     # input("Press Enter to Exit")
 
