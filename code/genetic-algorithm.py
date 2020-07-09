@@ -87,9 +87,24 @@ class Grid:
             np.random.randint(self.minimum.y+limit, self.maximum.y-limit),
         )
 
+    def borders(self, size):
+        return [
+            Polygon(self.width, size, 0.0, Point(self.minimum.x, self.maximum.y)),
+            Polygon(self.width, size, 0.0, Point(self.minimum.x, self.minimum.y - size)),
+            Polygon(size, self.height + size * 2.0, 0.0, Point(self.maximum.x, self.minimum.y - size)),
+            Polygon(size, self.height + size * 2.0, 0.0, Point(self.minimum.x - size, self.minimum.y - size))
+        ]
+
+    def generate(self, sx, sy, theta, limit):
+        obstacle = Polygon(sx, sy, theta, self.random(limit))
+        while self.first.intersects(obstacle) or self.final.intersects(obstacle):
+            obstacle = Polygon(sx, sy, theta, self.random(limit))
+        return obstacle
+
 
 def main():
     vehicleOffset = 2.0
+    vehicleSize = 1.0
 
     environmentMin = 0.0
     environmentMax = 20.0
@@ -98,7 +113,13 @@ def main():
 
     shortestPath = Line(vehicleGrid.first, vehicleGrid.final)
 
-    populationCount = 50
+    boundaries = vehicleGrid.borders(vehicleSize)
+
+    obstacles = [vehicleGrid.generate(vehicleSize, vehicleSize, 0.0, 0.0) for _ in range(40)]
+
+    populationCount = 80
+
+    # work in progress...
 
     # input("Press Enter to Exit")
 
