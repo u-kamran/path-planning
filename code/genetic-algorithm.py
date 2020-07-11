@@ -1,5 +1,4 @@
 import time
-import random
 
 import numpy as np
 
@@ -73,21 +72,15 @@ class Polygon(SPolygon):
 
 
 class Grid:
-    def __init__(self, minimum, maximum, offset):
+    def __init__(self, minimum, maximum, first, final):
         self.minimum = minimum
         self.maximum = maximum
         self.width = maximum.x - minimum.x
         self.height = maximum.y - minimum.y
-        self.first = self.minimum.translate(Point(offset, offset))
-        self.final = self.maximum.translate(Point(-offset, -offset))
+        self.first = first
+        self.final = final
 
-    def random(self, limit):
-        return Point(
-            np.random.randint(self.minimum.x+limit, self.maximum.x-limit),
-            np.random.randint(self.minimum.y+limit, self.maximum.y-limit),
-        )
-
-    def borders(self, size):
+    def generateBoundaries(self, size):
         return [
             Polygon(self.width, size, 0.0, Point(self.minimum.x, self.maximum.y)),
             Polygon(self.width, size, 0.0, Point(self.minimum.x, self.minimum.y - size)),
@@ -95,31 +88,50 @@ class Grid:
             Polygon(size, self.height + size * 2.0, 0.0, Point(self.minimum.x - size, self.minimum.y - size))
         ]
 
-    def generate(self, sx, sy, theta, limit):
-        obstacle = Polygon(sx, sy, theta, self.random(limit))
-        while self.first.intersects(obstacle) or self.final.intersects(obstacle):
-            obstacle = Polygon(sx, sy, theta, self.random(limit))
-        return obstacle
+    def random(self, size):
+        return Point(
+            np.random.randint(self.minimum.x, self.maximum.x-size.x+1),
+            np.random.randint(self.minimum.y, self.maximum.y-size.y+1),
+        )
+
+    def generateObstacles(self, count, size, theta):
+        obstacles = []
+        for _ in range(count):
+            obstacle = Polygon(size.x, size.y, theta, self.random(size))
+            while self.first.intersects(obstacle) or self.final.intersects(obstacle):
+                obstacle = Polygon(size.x, size.y, theta, self.random(size))
+            obstacles.append(obstacle)
+        return obstacles
 
 
 def main():
-    vehicleOffset = 2.0
-    vehicleSize = 1.0
+    gridMinimum = Point(0.0, 0.0)
+    gridMaximum = Point(20.0, 20.0)
 
-    environmentMin = 0.0
-    environmentMax = 20.0
+    vehicleFirst = Point(2.0, 2.0)
+    vehicleFinal = Point(18.0, 18.0)
 
-    vehicleGrid = Grid(Point(environmentMin, environmentMin), Point(environmentMax, environmentMax), vehicleOffset)
+    grid = Grid(gridMinimum, gridMaximum, vehicleFirst, vehicleFinal)
 
-    shortestPath = Line(vehicleGrid.first, vehicleGrid.final)
+    objectSize = Point(1.0, 1.0)
 
-    boundaries = vehicleGrid.borders(vehicleSize)
+    boundaries = grid.generateBoundaries(min(objectSize.x, objectSize.y))
 
-    obstacles = [vehicleGrid.generate(vehicleSize, vehicleSize, 0.0, 0.0) for _ in range(40)]
+    obstacleCount = 40
+    obstacleTheta = 0.0
+
+    obstacles = grid.generateObstacles(obstacleCount, objectSize, obstacleTheta)
+
+    shortestPath = Line(grid.first, grid.final)
+
+    startTime = time.time()
 
     populationCount = 80
-
     # work in progress...
+
+    endTime = time.time()
+
+    print("Time Elapsed:", endTime - startTime)
 
     # input("Press Enter to Exit")
 
