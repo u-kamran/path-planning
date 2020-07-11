@@ -104,6 +104,31 @@ class Grid:
         return obstacles
 
 
+def visualize(grid, boundaries, obstacles, title):
+    fig, ax = plt.subplots()
+
+    ax.set_title(title, weight='bold')
+
+    ax.plot(grid.first.x, grid.first.y, 'co')
+
+    ax.plot(grid.final.x, grid.final.y, 'mo')
+
+    for boundary in boundaries:
+        rectangle = ptc.Rectangle(
+            boundary.datum,
+            boundary.width,
+            boundary.height,
+            boundary.angle(),
+            edgecolor='None', facecolor='black', alpha=1.0
+        )
+        ax.add_patch(rectangle)
+
+    ax.grid()
+
+    plt.axis('scaled')
+    plt.show()
+
+
 def main():
     gridMinimum = Point(0.0, 0.0)
     gridMaximum = Point(20.0, 20.0)
@@ -121,6 +146,8 @@ def main():
     obstacleTheta = 0.0
 
     obstacles = grid.generateObstacles(obstacleCount, objectSize, obstacleTheta)
+
+    visualize(grid, boundaries, obstacles, "Environment")
 
     shortestPath = Line(grid.first, grid.final)
 
