@@ -111,7 +111,31 @@ def visualize(grid, boundaries, obstacles, title):
 
     ax.plot(grid.first.x, grid.first.y, 'co')
 
+    ax.annotate(
+        "FIRST", (grid.first.x, grid.minimum.y - 0.1),
+        horizontalalignment='center',
+        verticalalignment='top',
+        weight='bold', color='w',
+    )
+
     ax.plot(grid.final.x, grid.final.y, 'mo')
+
+    ax.annotate(
+        "FINAL", (grid.final.x, grid.maximum.y + 0.0),
+        horizontalalignment='center',
+        verticalalignment='bottom',
+        weight='bold', color='w'
+    )
+
+    for obstacle in obstacles:
+        rectangle = ptc.Rectangle(
+            obstacle.datum,
+            obstacle.width,
+            obstacle.height,
+            obstacle.angle(),
+            edgecolor='None', facecolor='grey', alpha=1.0
+        )
+        ax.add_patch(rectangle)
 
     for boundary in boundaries:
         rectangle = ptc.Rectangle(
