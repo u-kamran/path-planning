@@ -104,6 +104,17 @@ class Grid:
         return obstacles
 
 
+def individual(grid, segments, size):
+    points = [grid.first]
+
+    for _ in range(segments-2):
+        points.append(grid.random(size))
+
+    points.append(grid.final)
+
+    return points
+
+
 def visualize(grid, boundaries, obstacles, title):
     fig, ax = plt.subplots()
 
@@ -173,11 +184,15 @@ def main():
 
     visualize(grid, boundaries, obstacles, "Environment")
 
-    shortestPath = Line(grid.first, grid.final)
-
     startTime = time.time()
 
+    shortestPath = Line(grid.first, grid.final)
+
     populationCount = 80
+    pathSegments = 5
+
+    population = [individual(grid, pathSegments, objectSize) for _ in range(populationCount)]
+
     # work in progress...
 
     endTime = time.time()
