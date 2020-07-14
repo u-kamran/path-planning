@@ -88,31 +88,33 @@ class Grid:
             Polygon(size, self.height + size * 2.0, 0.0, Point(self.minimum.x - size, self.minimum.y - size))
         ]
 
-    def random(self, size):
+    def random(self, offset, size):
         return Point(
-            np.random.randint(self.minimum.x, self.maximum.x-size.x+1),
-            np.random.randint(self.minimum.y, self.maximum.y-size.y+1),
+            np.random.randint(self.minimum.x+offset.x, self.maximum.x-offset.x-size.x+1),
+            np.random.randint(self.minimum.y+offset.y, self.maximum.y-offset.y-size.y+1),
         )
 
     def generateObstacles(self, count, size, theta):
         obstacles = []
         for _ in range(count):
-            obstacle = Polygon(size.x, size.y, theta, self.random(size))
+            obstacle = Polygon(size.x, size.y, theta, self.random(Point(0, 0), size))
             while self.first.intersects(obstacle) or self.final.intersects(obstacle):
-                obstacle = Polygon(size.x, size.y, theta, self.random(size))
+                obstacle = Polygon(size.x, size.y, theta, self.random(Point(0, 0), size))
             obstacles.append(obstacle)
         return obstacles
 
 
-def individual(grid, segments, size):
+def individual(grid, interpolation, segments, size):
     points = [grid.first]
+    distance = 0
 
-    for _ in range(segments-2):
-        points.append(grid.random(size))
+    for s in range(segments):
+        nextPoint = grid.random(size, Point(0, 0)) if s < segments-1 else grid.final
+        segment = Line(points[-1], nextPoint)
+        points.extend(segment.divide(interpolation))
+        distance += segment.length
 
-    points.append(grid.final)
-
-    return points
+    return [distance, points]
 
 
 def visualize(grid, boundaries, obstacles, title):
@@ -189,9 +191,10 @@ def main():
     shortestPath = Line(grid.first, grid.final)
 
     populationCount = 80
-    pathSegments = 5
+    interpolation = 8
+    pathSegments = 4
 
-    population = [individual(grid, pathSegments, objectSize) for _ in range(populationCount)]
+    initialPopulation = [individual(grid, interpolation, pathSegments, objectSize) for _ in range(populationCount)]
 
     # work in progress...
 
