@@ -40,16 +40,16 @@ class Line(SLine):
         self.theta = np.arctan2(self.dy, self.dx)
 
     def divide(self, d):
-        ix = self.dx / d
-        iy = self.dy / d
-        segments = []
-        previous = self.first
-        for i in range(1, d):
-            current = Point(self.first.x+ix*i, self.first.y+iy*i)
-            segments.append(Line(previous, current))
-            previous = current
-        segments.append(Line(previous, self.final))
-        return segments
+        ix = self.dx / (d+1)
+        iy = self.dy / (d+1)
+        points = []
+        for i in range(1, d+1):
+            points.append(Point(
+                self.first.x+ix*i,
+                self.first.y+iy*i
+            ))
+        points.append(self.final)
+        return points
 
 
 class Polygon(SPolygon):
