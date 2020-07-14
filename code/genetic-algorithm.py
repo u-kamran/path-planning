@@ -117,7 +117,7 @@ def individual(grid, interpolation, segments, size):
     return [distance, points]
 
 
-def visualize(grid, boundaries, obstacles, title):
+def visualize(grid, boundaries, obstacles, title, population=None):
     fig, ax = plt.subplots()
 
     ax.set_title(title, weight='bold')
@@ -162,6 +162,12 @@ def visualize(grid, boundaries, obstacles, title):
 
     ax.grid()
 
+    if population is not None:
+        for path in population:
+            px = [point.x for point in path[1]]
+            py = [point.y for point in path[1]]
+            ax.plot(px, py, 'y-', alpha=0.2, markersize=4)
+
     plt.axis('scaled')
     plt.show()
 
@@ -201,6 +207,8 @@ def main():
     endTime = time.time()
 
     print("Time Elapsed:", endTime - startTime)
+
+    visualize(grid, boundaries, obstacles, "Initial Population", initialPopulation)
 
     # input("Press Enter to Exit")
 
