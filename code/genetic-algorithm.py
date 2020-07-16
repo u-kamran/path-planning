@@ -122,12 +122,16 @@ def fitness(population, obstacles, shortest):
 
     for distance, points in population:
         distance = 0
+        collisions = 0
 
         for i in range(len(points)-1):
             segment = Line(points[i], points[i+1])
             distance += segment.length
+            for obstacle in obstacles:
+                if segment.intersects(obstacle):
+                    collisions += 1000
 
-        score = np.sqrt((distance / shortest.length) ** 2)
+        score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
 
         individuals.append((score, [distance, points]))
 
