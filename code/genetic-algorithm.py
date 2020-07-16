@@ -117,6 +117,23 @@ def individual(grid, interpolation, segments, size):
     return [distance, points]
 
 
+def fitness(population, obstacles, shortest):
+    individuals = []
+
+    for distance, points in population:
+        distance = 0
+
+        for i in range(len(points)-1):
+            segment = Line(points[i], points[i+1])
+            distance += segment.length
+
+        score = np.sqrt((distance / shortest.length) ** 2)
+
+        individuals.append((score, [distance, points]))
+
+    return sorted(individuals, key=lambda s: s[0])
+
+
 def visualize(grid, boundaries, obstacles, title, population=None):
     fig, ax = plt.subplots()
 
@@ -201,6 +218,8 @@ def main():
     pathSegments = 4
 
     initialPopulation = [individual(grid, interpolation, pathSegments, objectSize) for _ in range(populationCount)]
+
+    gradedPopulation = fitness(initialPopulation, obstacles, shortestPath)
 
     # work in progress...
 
