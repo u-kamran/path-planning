@@ -106,26 +106,24 @@ class Grid:
 
 def individual(grid, interpolation, segments, size):
     points = [grid.first]
-    distance = 0
 
     for s in range(segments):
         nextPoint = grid.random(size, Point(0, 0)) if s < segments-1 else grid.final
         segment = Line(points[-1], nextPoint)
         points.extend(segment.divide(interpolation))
-        distance += segment.length
 
-    return [distance, points]
+    return points
 
 
 def fitness(population, obstacles, shortest):
     individuals = []
 
-    for distance, points in population:
+    for path in population:
         distance = 0
         collisions = 0
 
-        for i in range(len(points)-1):
-            segment = Line(points[i], points[i+1])
+        for i in range(len(path)-1):
+            segment = Line(path[i], path[i+1])
             distance += segment.length
             for obstacle in obstacles:
                 if segment.intersects(obstacle):
@@ -133,7 +131,7 @@ def fitness(population, obstacles, shortest):
 
         score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
 
-        individuals.append((score, [distance, points]))
+        individuals.append((score, path))
 
     return sorted(individuals, key=lambda s: s[0])
 
@@ -185,8 +183,8 @@ def visualize(grid, boundaries, obstacles, title, population=None):
 
     if population is not None:
         for path in population:
-            px = [point.x for point in path[1]]
-            py = [point.y for point in path[1]]
+            px = [point.x for point in path]
+            py = [point.y for point in path]
             ax.plot(px, py, 'y-', alpha=0.2, markersize=4)
 
     plt.axis('scaled')
