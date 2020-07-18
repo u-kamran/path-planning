@@ -136,6 +136,19 @@ def fitness(population, obstacles, shortest):
     return sorted(individuals, key=lambda s: s[0])
 
 
+def evolve(population, grid, count):
+    children = []
+    while len(children) < count:
+        parentA = np.random.randint(0, len(population))
+        parentB = np.random.randint(0, len(population))
+        pathA = population[parentA][1]
+        pathB = population[parentB][1]
+        crossoverPosition = len(pathA) // 2
+        child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
+        children.append(child)
+    return children
+
+
 def visualize(grid, boundaries, obstacles, title, population=None):
     fig, ax = plt.subplots()
 
