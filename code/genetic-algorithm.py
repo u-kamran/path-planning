@@ -141,11 +141,12 @@ def evolve(population, grid, count):
     while len(children) < count:
         parentA = np.random.randint(0, len(population))
         parentB = np.random.randint(0, len(population))
-        pathA = population[parentA][1]
-        pathB = population[parentB][1]
-        crossoverPosition = len(pathA) // 2
-        child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
-        children.append(child)
+        if parentA != parentB:
+            pathA = population[parentA][1]
+            pathB = population[parentB][1]
+            crossoverPosition = len(pathA) // 2
+            child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
+            children.append(child)
     return children
 
 
