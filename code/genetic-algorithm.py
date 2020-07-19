@@ -136,7 +136,7 @@ def fitness(population, obstacles, shortest):
     return sorted(individuals, key=lambda s: s[0])
 
 
-def evolve(population, grid, count):
+def evolve(population, grid, size, count, chance):
     children = []
     while len(children) < count:
         parentA = np.random.randint(0, len(population))
@@ -146,6 +146,9 @@ def evolve(population, grid, count):
             pathB = population[parentB][1]
             crossoverPosition = len(pathA) // 2
             child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
+            if np.random.random() <= chance:
+                mutationPosition = np.random.randint(0, len(child))
+                child[mutationPosition] = grid.random(size, Point(0, 0))
             children.append(child)
     return children
 
