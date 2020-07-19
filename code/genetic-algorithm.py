@@ -240,13 +240,17 @@ def main():
 
     gradedPopulation = fitness(initialPopulation, obstacles, shortestPath)
 
-    # work in progress...
+    mutationChance = 0.01
+
+    evolvedPopulation = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
 
     endTime = time.time()
 
     print("Time Elapsed:", endTime - startTime)
 
     visualize(grid, boundaries, obstacles, "Initial Population", initialPopulation)
+
+    visualize(grid, boundaries, obstacles, "Evolved Population", evolvedPopulation)
 
     # input("Press Enter to Exit")
 
