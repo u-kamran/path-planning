@@ -240,7 +240,7 @@ def main():
 
     gradedPopulation = fitness(initialPopulation, obstacles, shortestPath)
 
-    mutationChance = 0.01
+    mutationChance = 0.04
 
     evolvedPopulation = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
 
