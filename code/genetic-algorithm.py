@@ -133,7 +133,11 @@ def fitness(population, obstacles, shortest):
 
         individuals.append((score, path))
 
-    return sorted(individuals, key=lambda s: s[0])
+    return individuals
+
+
+def sort(population):
+    return sorted(population, key=lambda q: q[0])
 
 
 def evolve(population, grid, size, count, chance):
@@ -238,7 +242,7 @@ def main():
 
     initialPopulation = [individual(grid, interpolation, pathSegments, objectSize) for _ in range(populationCount)]
 
-    gradedPopulation = fitness(initialPopulation, obstacles, shortestPath)
+    gradedPopulation = sort(fitness(initialPopulation, obstacles, shortestPath))
 
     mutationChance = 0.04
 
