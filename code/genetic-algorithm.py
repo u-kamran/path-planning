@@ -104,6 +104,28 @@ class Grid:
         return obstacles
 
 
+class Path:
+    def __init__(self, points, obstacles, shortest):
+        self.score = np.inf
+        self.points = points
+        self.fitness(obstacles, shortest)
+
+    def fitness(self, obstacles, shortest):
+        distance = 0
+        collisions = 0
+
+        for i in range(len(self.points) - 1):
+            segment = Line(self.points[i], self.points[i + 1])
+            distance += segment.length
+            for obstacle in obstacles:
+                if segment.intersects(obstacle):
+                    collisions += 1000
+
+        self.score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
+
+        return self.score
+
+
 def individual(grid, interpolation, segments, size):
     points = [grid.first]
 
