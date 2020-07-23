@@ -105,10 +105,9 @@ class Grid:
 
 
 class Path:
-    def __init__(self, points, obstacles, shortest):
+    def __init__(self, points):
         self.score = np.inf
         self.points = points
-        self.fitness(obstacles, shortest)
 
     def fitness(self, obstacles, shortest):
         distance = 0
@@ -122,8 +121,6 @@ class Path:
                     collisions += 1000
 
         self.score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
-
-        return self.score
 
 
 def individual(grid, interpolation, segments, size):
@@ -176,7 +173,7 @@ def merge(left, right, population):
 
     while leftPosition < len(left) and rightPosition < len(right):
 
-        if left[leftPosition][0] <= right[rightPosition][0]:
+        if left[leftPosition].score <= right[rightPosition].score:
             population[leftPosition + rightPosition] = left[leftPosition]
             leftPosition += 1
         else:
@@ -198,8 +195,8 @@ def evolve(population, grid, size, count, chance):
         parentA = np.random.randint(0, len(population))
         parentB = np.random.randint(0, len(population))
         if parentA != parentB:
-            pathA = population[parentA][1]
-            pathB = population[parentB][1]
+            pathA = population[parentA].points
+            pathB = population[parentB].points
             crossoverPosition = len(pathA) // 2
             child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
             if np.random.random() <= chance:
@@ -256,8 +253,8 @@ def visualize(grid, boundaries, obstacles, title, population=None):
 
     if population is not None:
         for path in population:
-            px = [point.x for point in path]
-            py = [point.y for point in path]
+            px = [point.x for point in path.points]
+            py = [point.y for point in path.points]
             ax.plot(px, py, 'y-', alpha=0.2, markersize=4)
 
     plt.axis('scaled')
@@ -292,13 +289,25 @@ def main():
     interpolation = 8
     pathSegments = 4
 
-    initialPopulation = [individual(grid, interpolation, pathSegments, objectSize) for _ in range(populationCount)]
+    initialPopulation = []
 
-    gradedPopulation = sort(fitness(initialPopulation, obstacles, shortestPath))
+    for _ in range(populationCount):
+        path = Path(individual(grid, interpolation, pathSegments, objectSize))
+        path.fitness(obstacles, shortestPath)
+        initialPopulation.append(path)
+
+    gradedPopulation = sort(initialPopulation)
 
     mutationChance = 0.04
 
-    evolvedPopulation = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
+    evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
+
+    evolvedPopulation = []
+
+    for points in evolvedPaths:
+        path = Path(points)
+        path.fitness(obstacles, shortestPath)
+        evolvedPopulation.append(path)
 
     endTime = time.time()
 
