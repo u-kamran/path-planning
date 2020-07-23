@@ -287,7 +287,7 @@ def main():
 
     populationCount = 80
     interpolation = 8
-    pathSegments = 4
+    pathSegments = 2
 
     initialPopulation = []
 
@@ -299,15 +299,33 @@ def main():
     gradedPopulation = sort(initialPopulation)
 
     mutationChance = 0.04
+    evolutionCount = 0
+    evolutionMax = 20
 
-    evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
+    finalPopulation = None
 
-    evolvedPopulation = []
+    while evolutionCount < evolutionMax:
+        evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
 
-    for points in evolvedPaths:
-        path = Path(points)
-        path.fitness(obstacles, shortestPath)
-        evolvedPopulation.append(path)
+        evolvedPopulation = []
+
+        for points in evolvedPaths:
+            path = Path(points)
+            path.fitness(obstacles, shortestPath)
+            evolvedPopulation.append(path)
+
+        gradedPopulation.extend(evolvedPopulation)
+        gradedPopulation = sort(gradedPopulation)
+
+        if len(gradedPopulation) > populationCount:
+            gradedPopulation = gradedPopulation[:populationCount]
+
+        print("Evolution:", evolutionCount+1)
+
+        evolutionCount += 1
+
+        if evolutionCount == evolutionMax:
+            finalPopulation = gradedPopulation
 
     endTime = time.time()
 
@@ -315,7 +333,7 @@ def main():
 
     visualize(grid, boundaries, obstacles, "Initial Population", initialPopulation)
 
-    visualize(grid, boundaries, obstacles, "Evolved Population", evolvedPopulation)
+    visualize(grid, boundaries, obstacles, "Final Population", finalPopulation)
 
     # input("Press Enter to Exit")
 
