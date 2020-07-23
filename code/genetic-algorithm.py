@@ -159,7 +159,37 @@ def fitness(population, obstacles, shortest):
 
 
 def sort(population):
-    return sorted(population, key=lambda q: q[0])
+    if len(population) <= 1:
+        return population
+
+    mid = len(population) // 2
+
+    left = sort(population[:mid])
+    right = sort(population[mid:])
+
+    return merge(left, right, population.copy())
+
+
+def merge(left, right, population):
+    leftPosition = 0
+    rightPosition = 0
+
+    while leftPosition < len(left) and rightPosition < len(right):
+
+        if left[leftPosition][0] <= right[rightPosition][0]:
+            population[leftPosition + rightPosition] = left[leftPosition]
+            leftPosition += 1
+        else:
+            population[leftPosition + rightPosition] = right[rightPosition]
+            rightPosition += 1
+
+    for leftPosition in range(leftPosition, len(left)):
+        population[leftPosition + rightPosition] = left[leftPosition]
+
+    for rightPosition in range(rightPosition, len(right)):
+        population[leftPosition + rightPosition] = right[rightPosition]
+
+    return population
 
 
 def evolve(population, grid, size, count, chance):
