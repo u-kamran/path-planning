@@ -206,12 +206,10 @@ def evolve(population, grid, size, count, chance):
     return children
 
 
-def visualize(grid, boundaries, obstacles, title, population=None):
+def visualize(grid, boundaries, obstacles, title, population=None, optimal=None):
     fig, ax = plt.subplots()
 
     ax.set_title(title, weight='bold')
-
-    ax.plot(grid.first.x, grid.first.y, 'co')
 
     ax.annotate(
         "FIRST", (grid.first.x, grid.minimum.y - 0.1),
@@ -219,8 +217,6 @@ def visualize(grid, boundaries, obstacles, title, population=None):
         verticalalignment='top',
         weight='bold', color='w',
     )
-
-    ax.plot(grid.final.x, grid.final.y, 'mo')
 
     ax.annotate(
         "FINAL", (grid.final.x, grid.maximum.y + 0.0),
@@ -249,13 +245,21 @@ def visualize(grid, boundaries, obstacles, title, population=None):
         )
         ax.add_patch(rectangle)
 
-    ax.grid()
-
     if population is not None:
         for path in population:
             px = [point.x for point in path.points]
             py = [point.y for point in path.points]
             ax.plot(px, py, 'y-', alpha=0.2, markersize=4)
+
+    if optimal is not None:
+        px = [point.x for point in optimal.points]
+        py = [point.y for point in optimal.points]
+        ax.plot(px, py, 'c-', alpha=0.8, markersize=4)
+
+    ax.plot(grid.first.x, grid.first.y, 'co')
+    ax.plot(grid.final.x, grid.final.y, 'mo')
+
+    ax.grid()
 
     plt.axis('scaled')
     plt.show()
@@ -300,9 +304,10 @@ def main():
 
     mutationChance = 0.04
     evolutionCount = 0
-    evolutionMax = 20
+    evolutionMax = 10
 
     finalPopulation = None
+    optimalPath = None
 
     while evolutionCount < evolutionMax:
         evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
@@ -320,12 +325,13 @@ def main():
         if len(gradedPopulation) > populationCount:
             gradedPopulation = gradedPopulation[:populationCount]
 
-        print("Evolution:", evolutionCount+1)
+        print("Evolution:", evolutionCount + 1, "| Best Fitness Value:", gradedPopulation[0].score)
 
         evolutionCount += 1
 
         if evolutionCount == evolutionMax:
             finalPopulation = gradedPopulation
+            optimalPath = gradedPopulation[0]
 
     endTime = time.time()
 
@@ -334,6 +340,8 @@ def main():
     visualize(grid, boundaries, obstacles, "Initial Population", initialPopulation)
 
     visualize(grid, boundaries, obstacles, "Final Population", finalPopulation)
+
+    visualize(grid, boundaries, obstacles, "Optimal Path", None, optimalPath)
 
     # input("Press Enter to Exit")
 
