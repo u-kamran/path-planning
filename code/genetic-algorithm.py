@@ -265,6 +265,16 @@ def visualize(grid, boundaries, obstacles, title, population=None, optimal=None)
     plt.show()
 
 
+def scatterPlot(x, y, title, xlabel, ylabel):
+    fig, ax = plt.subplots()
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    plt.scatter(x, y, marker='o', c='c')
+    plt.grid()
+    plt.show()
+
+
 def main():
     gridMinimum = Point(0.0, 0.0)
     gridMaximum = Point(20.0, 20.0)
@@ -309,6 +319,8 @@ def main():
     finalPopulation = None
     optimalPath = None
 
+    averageFitness = []
+
     while evolutionCount < evolutionMax:
         evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
 
@@ -325,7 +337,18 @@ def main():
         if len(gradedPopulation) > populationCount:
             gradedPopulation = gradedPopulation[:populationCount]
 
-        print("Evolution:", evolutionCount + 1, "| Best Fitness Value:", gradedPopulation[0].score)
+        average = 0
+        for path in gradedPopulation:
+            average += path.score
+        average /= len(gradedPopulation)
+
+        averageFitness.append(average)
+
+        print(
+            "Evolution:", evolutionCount + 1,
+            "| Average Fitness:", average,
+            "| Best Fitness Value:", gradedPopulation[0].score
+        )
 
         evolutionCount += 1
 
@@ -342,6 +365,11 @@ def main():
     visualize(grid, boundaries, obstacles, "Final Population", finalPopulation)
 
     visualize(grid, boundaries, obstacles, "Optimal Path", None, optimalPath)
+
+    scatterPlot(
+        np.arange(1, evolutionMax + 1), averageFitness,
+        "Average Fitness of Population", "Evolution", "Fitness Value"
+    )
 
     # input("Press Enter to Exit")
 
