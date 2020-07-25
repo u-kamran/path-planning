@@ -134,6 +134,10 @@ def individual(grid, interpolation, segments, size):
     return points
 
 
+def bernsteinPolynomial(n, i, t):
+    return comb(n, i) * (t ** i) * ((1 - t) ** (n - i))
+
+
 def fitness(population, obstacles, shortest):
     individuals = []
 
