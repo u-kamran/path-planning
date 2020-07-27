@@ -321,10 +321,13 @@ def main():
     interpolation = 8
     pathSegments = 2
 
+    curveSamples = 16
+
     initialPopulation = []
 
     for _ in range(populationCount):
         path = Path(individual(grid, interpolation, pathSegments, objectSize))
+        path.points = bezierCurve(path.points, curveSamples)
         path.fitness(obstacles, shortestPath)
         initialPopulation.append(path)
 
