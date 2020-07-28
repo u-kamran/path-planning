@@ -152,27 +152,6 @@ def bernsteinPolynomial(n, i, t):
     return comb(n, i) * (t ** i) * ((1 - t) ** (n - i))
 
 
-def fitness(population, obstacles, shortest):
-    individuals = []
-
-    for path in population:
-        distance = 0
-        collisions = 0
-
-        for i in range(len(path)-1):
-            segment = Line(path[i], path[i+1])
-            distance += segment.length
-            for obstacle in obstacles:
-                if segment.intersects(obstacle):
-                    collisions += 1000
-
-        score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
-
-        individuals.append((score, path))
-
-    return individuals
-
-
 def sort(population):
     if len(population) <= 1:
         return population
