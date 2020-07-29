@@ -7,40 +7,9 @@ from scipy.special import comb
 import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 
+import environment as env
+
 from geometry import Point, Line, Polygon
-
-
-class Grid:
-    def __init__(self, minimum, maximum, first, final):
-        self.minimum = minimum
-        self.maximum = maximum
-        self.width = maximum.x - minimum.x
-        self.height = maximum.y - minimum.y
-        self.first = first
-        self.final = final
-
-    def generateBoundaries(self, size):
-        return [
-            Polygon(self.width, size, 0.0, Point(self.minimum.x, self.maximum.y)),
-            Polygon(self.width, size, 0.0, Point(self.minimum.x, self.minimum.y - size)),
-            Polygon(size, self.height + size * 2.0, 0.0, Point(self.maximum.x, self.minimum.y - size)),
-            Polygon(size, self.height + size * 2.0, 0.0, Point(self.minimum.x - size, self.minimum.y - size))
-        ]
-
-    def random(self, offset, size):
-        return Point(
-            np.random.randint(self.minimum.x+offset.x, self.maximum.x-offset.x-size.x+1),
-            np.random.randint(self.minimum.y+offset.y, self.maximum.y-offset.y-size.y+1),
-        )
-
-    def generateObstacles(self, count, size, theta):
-        obstacles = []
-        for _ in range(count):
-            obstacle = Polygon(size.x, size.y, theta, self.random(Point(0, 0), size))
-            while self.first.intersects(obstacle) or self.final.intersects(obstacle):
-                obstacle = Polygon(size.x, size.y, theta, self.random(Point(0, 0), size))
-            obstacles.append(obstacle)
-        return obstacles
 
 
 class Path:
@@ -212,22 +181,18 @@ def scatterPlot(x, y, title, xlabel, ylabel):
 
 
 def main():
-    gridMinimum = Point(0.0, 0.0)
-    gridMaximum = Point(20.0, 20.0)
 
-    vehicleFirst = Point(2.0, 2.0)
-    vehicleFinal = Point(18.0, 18.0)
+    inputs = {
+        "gridMinimum": Point(0.0, 0.0),
+        "gridMaximum": Point(20.0, 20.0),
+        "vehicleFirst": Point(2.0, 2.0),
+        "vehicleFinal": Point(18.0, 18.0),
+        "objectSize": Point(1.0, 1.0),
+        "obstacleCount": 40,
+        "obstacleTheta": 0.0
+    }
 
-    grid = Grid(gridMinimum, gridMaximum, vehicleFirst, vehicleFinal)
-
-    objectSize = Point(1.0, 1.0)
-
-    boundaries = grid.generateBoundaries(min(objectSize.x, objectSize.y))
-
-    obstacleCount = 40
-    obstacleTheta = 0.0
-
-    obstacles = grid.generateObstacles(obstacleCount, objectSize, obstacleTheta)
+    grid, boundaries, obstacles = env.generate(inputs)
 
     visualize(grid, boundaries, obstacles, "Environment")
 
@@ -244,7 +209,7 @@ def main():
     initialPopulation = []
 
     for _ in range(populationCount):
-        path = Path(individual(grid, interpolation, pathSegments, objectSize))
+        path = Path(individual(grid, interpolation, pathSegments, inputs["objectSize"]))
         path.points = bezierCurve(path.points, curveSamples)
         path.fitness(obstacles, shortestPath)
         initialPopulation.append(path)
@@ -261,7 +226,7 @@ def main():
     averageFitness = []
 
     while evolutionCount < evolutionMax:
-        evolvedPaths = evolve(gradedPopulation, grid, objectSize, populationCount, mutationChance)
+        evolvedPaths = evolve(gradedPopulation, grid, inputs["objectSize"], populationCount, mutationChance)
 
         evolvedPopulation = []
 
