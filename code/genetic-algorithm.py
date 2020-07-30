@@ -9,7 +9,7 @@ import matplotlib.patches as ptc
 
 import environment as env
 
-from geometry import Point, Line, Polygon
+from geometry import Point, Line
 
 
 class Path:
@@ -31,11 +31,11 @@ class Path:
         self.score = np.sqrt((distance / shortest.length) ** 2 + collisions ** 2)
 
 
-def individual(grid, interpolation, segments, size):
+def individual(grid, interpolation, segments):
     points = [grid.first]
 
     for s in range(segments):
-        nextPoint = grid.random(size, Point(0, 0)) if s < segments-1 else grid.final
+        nextPoint = grid.random(grid.size, Point(0, 0)) if s < segments-1 else grid.final
         segment = Line(points[-1], nextPoint)
         points.extend(segment.divide(interpolation))
 
@@ -94,7 +94,7 @@ def merge(left, right, population):
     return population
 
 
-def evolve(population, grid, size, count, chance):
+def evolve(population, grid, count, chance):
     children = []
     while len(children) < count:
         parentA = np.random.randint(0, len(population))
@@ -106,7 +106,7 @@ def evolve(population, grid, size, count, chance):
             child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
             if np.random.random() <= chance:
                 mutationPosition = np.random.randint(0, len(child))
-                child[mutationPosition] = grid.random(size, Point(0, 0))
+                child[mutationPosition] = grid.random(grid.size, Point(0, 0))
             children.append(child)
     return children
 
@@ -209,7 +209,7 @@ def main():
     initialPopulation = []
 
     for _ in range(populationCount):
-        path = Path(individual(grid, interpolation, pathSegments, inputs["objectSize"]))
+        path = Path(individual(grid, interpolation, pathSegments))
         path.points = bezierCurve(path.points, curveSamples)
         path.fitness(obstacles, shortestPath)
         initialPopulation.append(path)
@@ -226,7 +226,7 @@ def main():
     averageFitness = []
 
     while evolutionCount < evolutionMax:
-        evolvedPaths = evolve(gradedPopulation, grid, inputs["objectSize"], populationCount, mutationChance)
+        evolvedPaths = evolve(gradedPopulation, grid, populationCount, mutationChance)
 
         evolvedPopulation = []
 
