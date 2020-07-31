@@ -1,6 +1,6 @@
 import numpy as np
 
-from geometry import Point, Polygon
+from common.geometry import Point, Polygon
 
 
 class Grid:

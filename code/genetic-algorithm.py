@@ -7,9 +7,9 @@ from scipy.special import comb
 import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 
-import environment as env
+import common.environment as env
 
-from geometry import Point, Line
+from common.geometry import Point, Line
 
 
 class Path:
