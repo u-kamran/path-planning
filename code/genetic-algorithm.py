@@ -184,10 +184,12 @@ def scatterPlot(x, y, title, xlabel, ylabel):
 
 def main(args=None):
 
+    filename = "genetic-algorithm"
+
     if args is None:
         args = sys.argv[1:]
 
-    arguments = inputs.parse(args)
+    arguments = inputs.parse(filename, args)
 
     grid, boundaries, obstacles = env.generate(arguments)
 
@@ -197,33 +199,24 @@ def main(args=None):
 
     shortestPath = Line(grid.first, grid.final)
 
-    populationCount = 80
-    interpolation = 8
-    pathSegments = 2
-
-    curveSamples = 16
-
     initialPopulation = []
 
-    for _ in range(populationCount):
-        path = Path(individual(grid, interpolation, pathSegments))
-        path.points = bezierCurve(path.points, curveSamples)
+    for _ in range(arguments["populationCount"]):
+        path = Path(individual(grid, arguments["interpolation"], arguments["pathSegments"]))
+        path.points = bezierCurve(path.points, arguments["curveSamples"])
         path.fitness(obstacles, shortestPath)
         initialPopulation.append(path)
 
     gradedPopulation = sort(initialPopulation)
 
-    mutationChance = 0.04
-    evolutionCount = 0
-    evolutionMax = 10
-
     finalPopulation = None
     optimalPath = None
 
     averageFitness = []
+    evolutionCount = 0
 
-    while evolutionCount < evolutionMax:
-        evolvedPaths = evolve(gradedPopulation, grid, populationCount, mutationChance)
+    while evolutionCount < arguments["evolutionMax"]:
+        evolvedPaths = evolve(gradedPopulation, grid, arguments["populationCount"], arguments["mutationChance"])
 
         evolvedPopulation = []
 
@@ -235,8 +228,8 @@ def main(args=None):
         gradedPopulation.extend(evolvedPopulation)
         gradedPopulation = sort(gradedPopulation)
 
-        if len(gradedPopulation) > populationCount:
-            gradedPopulation = gradedPopulation[:populationCount]
+        if len(gradedPopulation) > arguments["populationCount"]:
+            gradedPopulation = gradedPopulation[:arguments["populationCount"]]
 
         average = 0
         for path in gradedPopulation:
@@ -253,7 +246,7 @@ def main(args=None):
 
         evolutionCount += 1
 
-        if evolutionCount == evolutionMax:
+        if evolutionCount == arguments["evolutionMax"]:
             finalPopulation = gradedPopulation
             optimalPath = gradedPopulation[0]
 
@@ -268,7 +261,7 @@ def main(args=None):
     visualize(grid, boundaries, obstacles, "Optimal Path", None, optimalPath)
 
     scatterPlot(
-        np.arange(1, evolutionMax + 1), averageFitness,
+        np.arange(1, arguments["evolutionMax"] + 1), averageFitness,
         "Average Fitness of Population", "Evolution", "Fitness Value"
     )
 
