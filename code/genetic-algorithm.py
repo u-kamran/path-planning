@@ -1,3 +1,4 @@
+import sys
 import time
 
 import numpy as np
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as ptc
 
 import common.environment as env
+import common.inputs as inputs
 
 from common.geometry import Point, Line
 
@@ -180,19 +182,14 @@ def scatterPlot(x, y, title, xlabel, ylabel):
     plt.show()
 
 
-def main():
+def main(args=None):
 
-    inputs = {
-        "gridMinimum": Point(0.0, 0.0),
-        "gridMaximum": Point(20.0, 20.0),
-        "vehicleFirst": Point(2.0, 2.0),
-        "vehicleFinal": Point(18.0, 18.0),
-        "objectSize": Point(1.0, 1.0),
-        "obstacleCount": 40,
-        "obstacleTheta": 0.0
-    }
+    if args is None:
+        args = sys.argv[1:]
 
-    grid, boundaries, obstacles = env.generate(inputs)
+    arguments = inputs.parse(args)
+
+    grid, boundaries, obstacles = env.generate(arguments)
 
     visualize(grid, boundaries, obstacles, "Environment")
 

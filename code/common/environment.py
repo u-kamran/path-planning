@@ -4,12 +4,12 @@ from common.geometry import Point, Polygon
 
 
 class Grid:
-    def __init__(self, inputs):
-        self.minimum = inputs["gridMinimum"]
-        self.maximum = inputs["gridMaximum"]
-        self.first = inputs["vehicleFirst"]
-        self.final = inputs["vehicleFinal"]
-        self.size = inputs["objectSize"]
+    def __init__(self, args):
+        self.minimum = args["gridMinimum"]
+        self.maximum = args["gridMaximum"]
+        self.first = args["vehicleFirst"]
+        self.final = args["vehicleFinal"]
+        self.size = args["objectSize"]
         self.width = self.maximum.x - self.minimum.x
         self.height = self.maximum.y - self.minimum.y
 
@@ -38,12 +38,12 @@ class Grid:
         return obstacles
 
 
-def generate(inputs):
+def generate(args):
 
-    grid = Grid(inputs)
+    grid = Grid(args)
 
     boundaries = grid.generateBoundaries()
 
-    obstacles = grid.generateObstacles(inputs["obstacleCount"], inputs["obstacleTheta"])
+    obstacles = grid.generateObstacles(args["obstacleCount"], args["obstacleTheta"])
 
     return grid, boundaries, obstacles
