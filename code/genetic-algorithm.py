@@ -113,6 +113,17 @@ def evolve(population, grid, count, chance):
     return children
 
 
+def select(graded, evolved, count):
+    graded.extend(evolved)
+    graded = sort(graded)
+
+    # truncation selection
+    if len(graded) > count:
+        graded = graded[:count]
+
+    return graded
+
+
 def visualize(grid, boundaries, obstacles, title, population=None, optimal=None):
     fig, ax = plt.subplots()
 
@@ -225,11 +236,7 @@ def main(args=None):
             path.fitness(obstacles, shortestPath)
             evolvedPopulation.append(path)
 
-        gradedPopulation.extend(evolvedPopulation)
-        gradedPopulation = sort(gradedPopulation)
-
-        if len(gradedPopulation) > arguments["populationCount"]:
-            gradedPopulation = gradedPopulation[:arguments["populationCount"]]
+        gradedPopulation = select(gradedPopulation, evolvedPopulation, arguments["populationCount"])
 
         average = 0
         for path in gradedPopulation:
