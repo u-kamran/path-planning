@@ -1,4 +1,3 @@
-import sys
 import time
 
 import numpy as np
@@ -103,14 +102,9 @@ def select(graded, evolved, count):
     return graded
 
 
-def main(args=None):
-
+def main():
     filename = "genetic-algorithm"
-
-    if args is None:
-        args = sys.argv[1:]
-
-    arguments = inputs.parse(filename, args)
+    arguments = inputs.parse(filename)
 
     grid, boundaries, obstacles = environment.generate(arguments)
 
@@ -155,11 +149,12 @@ def main(args=None):
 
         averageFitness.append(average)
 
-        print(
-            "Evolution:", evolutionCount + 1,
-            "| Average Fitness:", average,
-            "| Best Fitness Value:", gradedPopulation[0].score
-        )
+        if arguments["verbose"]:
+            print(
+                "Evolution:", evolutionCount + 1,
+                "| Average Fitness:", average,
+                "| Best Fitness Value:", gradedPopulation[0].score
+            )
 
         evolutionCount += 1
 
@@ -182,7 +177,7 @@ def main(args=None):
         "Average Fitness of Population", "Evolution", "Fitness Value"
     )
 
-    # input("Press Enter to Exit")
+    input("Press Enter to Exit")
 
 
 if __name__ == "__main__":

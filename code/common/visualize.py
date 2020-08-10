@@ -58,6 +58,8 @@ def visualizeResult(grid, boundaries, obstacles, title, population=None, optimal
     ax.grid()
 
     plt.axis('scaled')
+
+    plt.ion()
     plt.show()
 
 
@@ -68,4 +70,5 @@ def scatterPlot(x, y, title, xlabel, ylabel):
     ax.set_ylabel(ylabel)
     plt.scatter(x, y, marker='o', c='c')
     plt.grid()
+    plt.ion()
     plt.show()
