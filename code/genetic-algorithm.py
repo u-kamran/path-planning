@@ -40,6 +40,34 @@ def individual(grid, interpolation, segments):
     return points
 
 
+def evolve(population, grid, count, chance):
+    children = []
+    while len(children) < count:
+        parentA = np.random.randint(0, len(population))
+        parentB = np.random.randint(0, len(population))
+        if parentA != parentB:
+            pathA = population[parentA].points
+            pathB = population[parentB].points
+            crossoverPosition = len(pathA) // 2
+            child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
+            if np.random.random() <= chance:
+                mutationPosition = np.random.randint(0, len(child))
+                child[mutationPosition] = grid.random(grid.size, Point(0, 0))
+            children.append(child)
+    return children
+
+
+def select(graded, evolved, count):
+    graded.extend(evolved)
+    graded = sort(graded)
+
+    # truncation selection
+    if len(graded) > count:
+        graded = graded[:count]
+
+    return graded
+
+
 def sort(population):
     if len(population) <= 1:
         return population
@@ -74,40 +102,11 @@ def merge(left, right, population):
     return population
 
 
-def evolve(population, grid, count, chance):
-    children = []
-    while len(children) < count:
-        parentA = np.random.randint(0, len(population))
-        parentB = np.random.randint(0, len(population))
-        if parentA != parentB:
-            pathA = population[parentA].points
-            pathB = population[parentB].points
-            crossoverPosition = len(pathA) // 2
-            child = pathA[:crossoverPosition] + pathB[crossoverPosition:]
-            if np.random.random() <= chance:
-                mutationPosition = np.random.randint(0, len(child))
-                child[mutationPosition] = grid.random(grid.size, Point(0, 0))
-            children.append(child)
-    return children
-
-
-def select(graded, evolved, count):
-    graded.extend(evolved)
-    graded = sort(graded)
-
-    # truncation selection
-    if len(graded) > count:
-        graded = graded[:count]
-
-    return graded
-
-
 def main():
     filename = "genetic-algorithm"
     arguments = inputs.parse(filename)
 
     grid, boundaries, obstacles = environment.generate(arguments)
-
     visualizeResult(grid, boundaries, obstacles, "Environment")
 
     startTime = time.time()
@@ -167,9 +166,7 @@ def main():
     print("Time Elapsed:", endTime - startTime)
 
     visualizeResult(grid, boundaries, obstacles, "Initial Population", initialPopulation)
-
     visualizeResult(grid, boundaries, obstacles, "Final Population", finalPopulation)
-
     visualizeResult(grid, boundaries, obstacles, "Optimal Path", None, optimalPath)
 
     scatterPlot(
